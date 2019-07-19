@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+{% block content %}
+<body style = "padding: 0px 0px; padding-top: 100px; height: 100%; background-size: cover;">
+  <div class = "shopping-cart" style="max-width: 80%; min-width: auto; padding-bottom: 60px; height: auto; margin-top: 0;">
+    <form method = "POST" action = "">
+      {{ form.hidden_tag() }}
+      <legend class = "border-bottom" style="margin-bottom: 0px;height: 60px;padding-top: 10px;">Login</legend>
+      <div class="form-group" style = "margin-bottom: 0px; height: 135px">
+        {{ form.email.label(class="flabel", style = "float: left; margin-left: 5%; margin-right: 5%; padding-top: 5%; padding-bottom: 0px; padding-left: 0px; text-align: left; border-bottom: none; height: 60px;") }}
+        {% if form.email.errors %}
+            {{ form.email(class="form-c form-c-lg", style = "height: 46px; float: left; width: 90%; margin-left: 5%; margin-right: 5%; left: 0px") }}
+            <div class="error-feedback">
+                {% for error in form.email.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+          {{ form.email(class="form-c form-c-lg", style = "height: 46px; float: left; width: 90%; margin-left: 5%; margin-right: 5%; left: 0px") }}
+        {% endif %}
+      </div>
+      <div class="form-group" style = "margin-bottom: 0px; height: 135px">
+        {{ form.zuoraId.label(class="flabel", style = "float: left; margin-left: 5%; margin-right: 5%; padding-top: 5%; padding-bottom: 0px; padding-left: 0px; text-align: left; border-bottom: none; height: 60px;") }}
+        {% if form.zuoraId.errors %}
+            {{ form.zuoraId(class="form-c form-c-lg", style = "height: 46px; float: left; width: 90%; margin-left: 5%; margin-right: 5%; left: 0px") }}
+            <div class="error-feedback">
+                {% for error in form.zuoraId.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+          {{ form.zuoraId(class="form-c form-c-lg", style = "height: 46px; float: left; width: 90%; margin-left: 5%; margin-right: 5%; left: 0px") }}
+        {% endif %}
+      </div>
+
+      <div class="form-group" style="height: 130px; margin-bottom: 0px;">
+        {{ form.password.label(class="flabel", style = "float: left;margin-left: 5%;margin-right: 5%;padding-top: 0%;padding-bottom: 0px;padding-left: 0px;text-align: left;border-bottom: none;height: 30px;") }}
+        {% if form.password.errors %}
+            {{ form.password(class="form-c form-c-lg is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.password.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+          {{ form.password(class="form-c form-c-lg", style = "float: left; width: 90%; margin-left: 5%; margin-right: 5%; margin-bottom: 10px;") }}
+        {% endif %}
+      </div>
+      <div class = "totalprice" style = "padding-top: 30px;">
+        {{ form.submit(class="btn btn-outline-info", style = "color: #ffffff; background-color: #0253c5; text-align: center;") }}
+      </div>
+    </form>
+  </div>
+</body>
+{% endblock content %}

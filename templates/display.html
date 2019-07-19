@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+{% block content %}
+<body style = "padding: 0px 0px; padding-top: 100px; height: 100%; background-size: cover;">
+  <div style = "width: 80%; padding-top: 5%; height: 100%;">
+    <span style = "margin-top: 5%">
+      {{ zuoraData }}
+    </span>
+    <table>
+      {% for item in zuoraData %}
+        <tr>
+          <td class = "label-output">
+            <!-- Print key name here or smth -->
+            {{ item }}
+          </td>
+          <td class = "data-output">
+            <!-- Print the value -->
+            {{ zuoraData[item] }}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+</body>
+{% endblock content %}

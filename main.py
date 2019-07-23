@@ -5,14 +5,30 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange
 import requests, json
 from requests.auth import HTTPBasicAuth
 
+class ZuoraUser:
+    def setDetails(self, email, password):
+        self.email = email 
+        self.password = password
+
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "sZWjFJmyFQnzkVMxbOIAIZNJhaJV"
+app.config['SECRET_KEY'] = "fAkEsEcReTkEy"
+
+zuoraAccount = ZuoraUser()
+
+
+
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators = [DataRequired(), Email()])
     zuoraId = StringField("Zuora ID", validators = [DataRequired()])
     password = PasswordField("Password", validators = [DataRequired()])
     submit = SubmitField("Login")
+
+class ZuoraLoginForm(FlaskForm):
+    email = StringField("Email", validators = [DataRequired(), Email()])
+    password = PasswordField("Password", validators = [DataRequired()])
+    submit = SubmitField("Login")
+
 
 def getAccountInfo(accountId, username, password):
     return requests.get('https://rest.zuora.com/v1/accounts/' + accountId,
@@ -30,53 +46,27 @@ def display(zuoraData):
 
 @app.route('/', methods = ["GET", "POST"])
 def home():
-    form = LoginForm()
+    form = ZuoraLoginForm()
     if form.validate_on_submit():
-        zuoraUser = form.email.data
-        zuoraPass = form.password.data
-        zuoraId = form.zuoraId.data
-        accountInfo = getAccountInfo(zuoraId, zuoraUser, zuoraPass).json()
-        subscriptionInfo = getSubscriptionInfo(zuoraId, zuoraUser, zuoraPass).json()
-        ratePlanCharges = subscriptionInfo["subscriptions"][0]["ratePlans"][0]["ratePlanCharges"]
-        subscriptions = subscriptionInfo["subscriptions"][0]
-
-        response = {}
-
-        if "paymentTerm" in accountInfo["billingAndPayment"]:
-            response["Payment Term"] = accountInfo["billingAndPayment"]["paymentTerm"]
-
-        if "currency" in accountInfo["billingAndPayment"]:
-            response["Currency"] = accountInfo["billingAndPayment"]["currency"]
-
-        if "bookDate" in subscriptions:
-            response["Book Date"] = subscriptions["bookDate"]
-
-        if "termType" in subscriptions:
-            response["Term Setting"] = subscriptions["termType"]
-
-        if "poNumber" in subscriptions:
-            response["PO Number"] = subscriptions["poNumber"]
-
-        if "signatureDate" in subscriptions:
-            response["Signature Date"] = subscriptions["signatureDate"]
-
-        if "subscriptionEdition" in subscriptions:
-            response["Subscription Edition"] = subscriptions["subscriptionEdition"]
-
-        for ratePlanCharge in ratePlanCharges:
-            if ratePlanCharge["name"] == "Milestone":
-                response["Milestone, Non-billing Total"] = ratePlanCharge["nonBillingTotal"]
-                response["Milestone, Total Budgeted Hours"] = ratePlanCharge["totalBudgetedHours"]
-            if ratePlanCharge["name"] == "Retainer Fee":
-                response["Retainer Fee, Total"] = ratePlanCharge["Total"]
-            if ratePlanCharge["name"] == "Time & Materials Actuals":
-                response["Time & Materials Actuals, Non-billing Total"] = ratePlanCharge["nonBillingTotal"]
-                response["Time & Materials Actuals, Total Budgeted Hours"] = ratePlanCharge["totalBudgetedHours"]
-
+        zuoraAccount.setDetails(form.email.data, form.password.data)
+        
         #set whatever data is retrieved to a cariable named results
-        return redirect(url_for('display', zuoraData = response))
+        return redirect(url_for('zuoraAccountLookup', email = zuoraAccount.email, password = zuoraAccount.password))
         #Do smth with the login info
     return render_template('login.html', title = 'Login', form = form)
+
+@app.route('/api/zlookup/<email>+<password>')
+def zuoraLookup(email, password):
+    return requests.post('https://rest.apisandbox.zuora.com/v1/action/query', data = json.dumps({'queryString' : 'select Id, Name from account'}), auth = HTTPBasicAuth(zuoraAccount.email, zuoraAccount.password) )
+
+@app.route('/zuoralookup', methods = ["GET", "POST"])
+def zuoraAccountLookup():
+    #response = requests.post('https://rest.apisandbox.zuora.com/v1/action/query', data = json.dumps({'queryString' : 'select Id, Name from account'}), auth = HTTPBasicAuth(zuoraAccount.email, zuoraAccount.password) )
+    #for item in response:
+     #   print('item: ' + item)
+
+
+    return render_template('lookup.html', title = "Zuora Account Lookup")
 
 if __name__ == '__main__':
     app.run()

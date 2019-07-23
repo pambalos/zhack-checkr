@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+{% block content %}
+<script>
+    var selectList = document.getElementById('selectList');
+    
+    var request = new XMLHttpRequest()
+    
+    request.open('GET', 'http://127.0.0.1:5000/')
+
+</script>
+<body style = "margin-top: 10%">
+    <select id = "selectList">
+
+    </select>
+</body>
+{% endblock content %}
